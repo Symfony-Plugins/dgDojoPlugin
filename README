@@ -1,0 +1,356 @@
+== Symfony Dojo Plugin ==
+
+=== Author ===
+
+Dean Glazeski <dnglaze [at] gmail [dot] com>
+
+=== Motivation ===
+
+This plugin was started due to a lack of support for the previous Dojo plugins available for symfony.  This plugin brings in some helpers to aid in the integration of Dojo capabilities with Symfony.  This includes toolbars, trees, context menus, lightboxes, and tons of other great widgets brought to you by the Dojo team.  There is a great deal of documentation available on the [http://dojotoolkit.org/book/dojo-book-1-0 Dojo website].
+
+=== Requirements ===
+
+This plugin uses the sfWidget class to handle the attributes and options part of these objects since they are based on HTML objects.  This means that you must either be using Symfony 1.1 or have the sfWidget class available for use.  You must also add a couple of lines to your layouts.  These lines are shown below.
+
+{{{
+#!php
+<?php use_helper( ..., 'Dojo', ...) ?>
+
+...
+
+<?php dojo_includes() ?>
+
+...
+}}}
+
+The dojo_includes call is best placed at the bottom of the layout so that any Dojo objects used in a view, action, or component item will get properly added to the list of includes.  You will also need to get the [http://dojotoolkit.org/downloads Dojo Toolkit] and place it in a web accessible javascript directory.  You can specify where this is in your application settings with the dojo_js setting or allow the plugin to assume dojo.js is at '/js/dojoToolkit/dojo/dojo.js' in reference to web root.
+
+=== Command Control ===
+
+==== Dojo Button ====
+
+The Dojo button can be accessed by either building up the class DojoButton or by using the helper function dojo_button.
+
+{{{
+#!php
+<?php echo dojo_button( 'A Button', array( 'onclick' => "location.href='".url_for( '@homepage' )."'" ) ?>
+
+<?php
+    // constructor can also take the options array as a second argument
+    $button = new DojoButton( 'A Button' );
+    $button->setAttribute( 'onclick', "location.href='".url_for( '@homepage' )."'" );
+    // alternate attribute setting syntax
+    $button->id = 'button1';
+    echo $button;
+?>
+}}}
+
+The DojoButton will automatically become a drop down or a combo button depending on how you use it.  If you add menu items to it, it will become a drop down button.  If you also set the onclick attribute of the button it will then become a combo button.  Below is an example of this.
+
+{{{
+#!php
+<?php
+    $button = new DojoButton( 'Button1' );
+    $button->id = 'button1';
+
+    // this will make it a drop down button
+    $button['sub1'] = new DojoMenuItem( 'Sub Item 1' );
+    $button['sub2'] = new DojoMenuItem( 'Sub Item 2' );
+
+    // this makes it a combo button
+    $button->onclick = "location.href='".url_for( '@homepage' )."'";
+    echo $button;
+?>
+}}}
+
+This will create a combo button that links to the homepage.  It also has two submenu items to choose from.  The Dojo button handles the submenu exactly like the DojoMenuItem.  Accessing the submenu attributes is done with setMenuAttribute.  The available attributes for both the menu item and the submenu are the same as with the DojoMenuItem.
+
+The DojoButton has the following available attributes:
+ * iconClass -Class to apply to div in button to make it display an icon
+ * label - Text to display in the button (Use ''setLabel()'' after creation to change); this is also set by the constructor
+ * showLabel - Whether or not to display the text label in the button
+
+==== Dojo Menu Item ====
+
+The Dojo menu item is the basic unit used for a Dojo menu.  It offers an easy to use interface to setup a menu item inside of a menu object.  This object is also smart enough to start a submenu as soon as you add a sub item to it.  Sometimes it is necessary to set an attribute of the submenu for the menu item.  This can be handled through the use of the setMenuAttribute function of the DojoMenuItem class.  Valid attributes for the submenu are the same as for the DojoMenu object.
+
+{{{
+#!php
+<?php
+    $menuItem = new DojoMenuItem('item1');
+    $menuItem->setMenuAttribute('popupDelay', 0);
+    $menuItem['subitem1'] = new DojoMenuItem('subitem2');
+?>
+}}}
+
+This will create a menu item with a name of 'item1' that also has a single submenu item.  It also sets up the menu so that the popup delay is zero instead of the 500ms default.
+
+The available attributes for a menu item are listed below:
+ * disabled - If true, the menu item will be disabled
+ * iconClass - Class to apply to div in button to make it display an icon
+ * label - The menu text; this is also set by the constructor
+
+==== Dojo Menu ====
+
+The Dojo menu is mainly used on its own as a context menu for certain areas or an entire area.  It also happens to be used as the submenu for both menu items and button objects.  This section shows you how to use the PHP classes to create these menus.
+
+The Dojo menu can be created by using the DojoMenu class.  A helper function does not exist due to the possible encapsulation of many sub-menus in one menu.
+
+{{{
+#!php
+<?php
+    $menu = new DojoMenu();
+    $menu->popupDelay = 0;
+    $menu['first'] = new DojoMenuItem('First');
+    $menu['second'] = new DojoMenuItem('Second');
+    $menu['second']['submenu1'] = new DojoMenuItem('Submenu 1');
+    $menu['second']['submenu2'] = new DojoMenuItem('Submenu 2');
+    $menu->contextMenuForWindow = true;
+    $menu->style = 'display: none;';
+    echo $menu;
+?>
+}}}
+
+This will create a menu that is displayed by right clicking anywhere in the window.  It has two options that are created using the DojoMenuItem class where the second menu item has a submenu with two more menu items in it.
+
+Available attributes for the DojoMenu are listed below:
+ * contextMenuForWindow - If true, right clicking anywhere on the window will cause the menu to open
+ * popupDelay - Number of milliseconds before hovering (without clicking) causes popup menu items to open and show their contents
+ * targetNodeIds - List of DOM node IDs to attach to.  Fill this with node IDs at creation and the menu becomes a context menu for those nodes
+ * leftClickToOpen - If true, the menu will open with left mouse click instead of a right click
+
+==== Dojo Toolbar ====
+
+A Dojo toolbar gives you the ability to have a toolbar in your webpage.  For the same reason as the Dojo menu, this can also only be created using the object interface.  The class to create a toolbar is called DojoToolbar.  This offers a similar interface as the menu for creating a toolbar.
+
+{{{
+#!php
+<?php
+    $toolbar = new DojoToolbar();
+    
+    // one way to add a button
+    $toolbar->addItem('Home');
+    $toolbar['Home']->setAttribute('onclick', "location.href='".url_for('@homepage')."'");
+    $toolbar['Home']->id = 'home';
+    
+    // second method for adding button
+    $toolbar['Site'] = new DojoButton('Site');
+    $toolbar['Site']->setAttribute('id', 'site0');
+    $toolbar['Site']->setMenuAttribute('popupDelay', 0);
+    
+    $toolbar['Site']['gConf'] = new DojoMenuItem('Global Configuration');
+    $toolbar['Site']['gConf']->setAttribute('iconClass', 'configuration');
+    $toolbar['Site']['gConf']->setMenuAttribute('id', 'conf_submenu');
+    
+    $toolbar['Site']['gConf']['front'] = new DojoMenuItem('Frontend Configuration');
+    $toolbar['Site']['gConf']['front']->setAttribute('iconClass', 'configuration');
+    $toolbar['Site']['gConf']['front']->onClick = "location.href='".url_for('@config')."'";
+
+    echo $toolbar;
+?>
+}}}
+
+This will create a toolbar that has two top level buttons 'Site' and 'Home'.  The Home button is left as just a link while the Site button has a submenu with another menu item that also has a submenu.  Again, you can see both methods of setting an attribute.  Also shown are the two ways of adding a button to the toolbar by either the array syntax or the addItem function.  The DojoMenu also offers the same two methods of adding items.
+
+=== User Assitance and Feedback ===
+
+==== Dialog Box ====
+
+The dialog box is used for text or showing forms, or anything else you can type in HTML.  It is essentially gives you a light box type of effect for showing this content.  If you happen to put a form in the dialog box, Dojo will automatically select the first focusable element in the dialog box.  The way to access the dialog box is to use the dojo_dialog helper.
+
+{{{ 
+#!php
+<?php echo dojo_dialog( 'A Dialog', 'Stuff for the dialog.', array( 'id' => 'dialog1' ) ) ?> 
+}}}
+
+This creates a dialog box with an ID of dialog1.  The dialog box supports many other options passed as the third parameter to this helper. The available options are outlined below:
+ * errorMessage - Message to show if there is an error loading the dialog
+ * extractContent - Tells Dojo to extract visible content between <body> and </body>
+ * href - Location where the content for the pane comes from
+ * id - Used to set the ID for the box.  This is used in conjunction with buttons or links that are exposing the dialog box
+ * isLoaded - What to do when the content pane is loaded
+ * loadingMessage - Message shown while downloading the content
+ * open - If the dialog box should be initially open
+ * parseOnLoad - Parse the content and create widgets if any
+ * preload - Preload the content, meaning, load the content of the pane when the page loads
+ * preventCache - Cache retrieved content extenally
+ * refreshOnShow - Refresh (re-download) content when pane goes from hidden to shown
+
+==== Tooltip ====
+
+The Dojo tooltip object is accessible using the dojo_tooltip function.  This will allow you to display a tooltip for a particular object based on an id.
+
+{{{
+#!php
+<?php echo dojo_tooltip( 'divId', 'Tooltip Message', array() ) ?>
+}}}
+
+This will create a tooltip that shows for the item with an ID of divId.  The first argument can instead by a comma separated list of IDs and the tooltip will show for each ID.  The second argument is the text for the tooltip and the final parameter is an optional array of options for the tooltip.  Available options are listed below:
+ * connectId - List of node IDs to attach the tooltip to
+ * label - Text to be displayed in the tooltip
+ * showDelay - How long before the tooltip becomes visible while hovering/focused on the item
+ * position - Where to put tooltip in reference to connected node (above, below, left, right)
+
+==== Tooltip Dialog ====
+
+The purpose of a tooltip dialog is to allow the display of forms in a tooltip that can be closed by clicking anywhere on the screen.  This is different from the dialog box, which has to be closed by clicking the [X] in the corner or by pressing escape.
+
+To use a tooltip dialog, use the dojo_tooltip_dialog helper.
+
+{{{
+#!php
+<?php echo dojo_tooltip_dialog( 'My Form', $form ) ?>
+}}}
+
+This will create a button that, when clicked, will show a tooltip dialog box with a form in it.  The function also accepts a third parameter that is a map of HTML attributes for the dialog div.  The tooltip dialog has the same available options as the regular dialog box
+
+==== Title Pane ====
+
+The Dojo title pane is a content section with a title bar.  The visibility of the content can be hidden by clicking on this title bar.  To create a title bar div, use the dojo_titlepane helper.
+
+{{{
+#!php
+<?php echo dojo_titlepane( 'The Title', $attributes ) ?>
+    <!-- Content for the div -->
+</div><!-- The helper starts div, you must end it -->
+}}}
+
+This will create a TitlePane with a title of 'The Title' and will hold all of the content between there and the div closer.  The available attributes you can set for the title pane are listed below:
+ * duration - How long in milliseconds the fade in/fade out effect should take
+ * open - Whether the panel is initially open or not
+ * title - Title of the pane.  Use ''setTitle'' after creation to change this title.  This option is overridden by the title parameter in the helper.
+
+==== Progress Bar ====
+
+The progress bar can be used to show progress.  To create a progress bar, use the dojo_progress_bar helper.
+
+{{{
+#!php
+<?php echo dojo_progress_bar( 'jsProgress', array( 'style' => 'width: 300px;', 'indeterminate' => false ) ?>
+}}}
+
+The first argument is required and the second argument is for the various options for the progress bar.  The first argument is important because it acts as the javascript ID in Dojo and gives you direct access to the widget.  That way, you can do the following in javascript.
+
+{{{
+jsProgress.update( { indeterminate: false } );
+}}}
+
+The update function is explained on the [http://dojotoolkit.org/book/dojo-book-0-9/part-2-dijit/user-assistance-and-feedback/progress-bar Dojo page] for progress bar.  The available options for the progress bar are listed below:
+ * indeterminate - Show that a process is underway, but the progress of the process is unknown
+ * maximum - Maximum value possible
+ * places - Number of places to show in values
+ * progress - Percentage or number showing initial progress.  If you have a '%' it is treated as a percent.  If no percent is there, it is based on the maximum value.
+
+=== Layout ===
+
+These are the various Dojo items that control how things are shown in a layout.
+
+==== Content Pane ====
+
+Content panes are the major items used as sub-containers for the different Dojo containers.  The content pane is very similar to an iframe, but it contains extra design features, fits in the current theme, and renders widgets properly.  To create a content pane, use the dojo_content_pane helper.
+
+{{{
+#!php
+<?php echo dojo_content_pane( 'A Title', $attributes ) ?>
+    <h1>I'm content!</h1>
+</div> <!-- must close it manually -->
+}}}
+
+This will create a content pane that is not the child of any container, but has the title "A Title".  The $attributes array is for setting options for the HTML tag or to be sent to Dojo for configuration of the content pane.  The available Dojo attributes are listed below:
+ * errorMessage - Message that shows if an error occurs
+ * extractContent - Extract visible content from inside <body> and </body> tags
+ * href - href of the content that displays in the pane
+ * isLoaded - Tells the loading status
+ * loadingMessage - Message that shows while downloading content
+ * parseOnLoad - Parse content in pane and create widgets if any
+ * preload - Force load of content in pane even if it is hidden
+ * preventCache - Prevent the cache of content retrieved externally
+ * refreshOnShow - Refresh content in the pain when it goes from hidden to shown
+ * title - Title for the content pane (used mainly for tab or accordion containers)
+ * closable - Whether the content pane can be closed or not (used for the tab container)
+ * selected - Lets you choose the default pane to show (used in accordion panes)
+ * region - Set where to place the content pane.  Can be top, bottom, center, left, or right (used in border containers)
+ * minSize - Minimum size in pixels for a pane (used in border containers)
+ * maxSize - Maximum size in pixels for a pane (used in border containers)
+ * splitter - If true, allows you to adjust the size of the pane with a splitter bar.  Note: pane with region of center cannot have this (used in border containers)
+ * persist - Maintains the position of splitter between sessions (used in border containers of panes with a splitter)
+
+==== Tab Container ====
+
+The tab container is a way of showing content with different tabs loaded with javascript.  The container houses multiple content panes with their title attributes used as the tab text.  To create a tab container, use the dojo_tabs helper.  For the different sub content panes, use dojo_content_pane.
+
+{{{
+#!php
+<?php echo dojo_tabs( $attributes ) ?>
+    <?php echo dojo_content_pane( 'Pane 1' ) ?>
+        <h1>Pane 1 Information!</h1>
+    </div>
+    <?php echo dojo_content_pane( 'Pane 2', array( 'closable' => true ) ) ?>
+        <h2>Pane 2 Information!</h2>
+    </div>
+</div> <!-- must manually close the containers div -->
+}}}
+
+This will create a tab container that has two tabs labelled "Pane 1" and "Pane 2", which will have an [x] in it for closing it.  You can then select between the two for stuff to show.  The available options for the tab container include:
+ * tabPosition - Where the tabs are placed in reference to the data panes.  Can be top, bottom, left-h, or right-h.
+
+==== Stack Container ====
+
+The stack container is sort of like a pager in javascript.  You need to create buttons that make the page go to the next, previous, or a selected page.  You use content panes to define the pages in the stack container.  To create a stack container, use the dojo_stack helper.
+
+{{{
+#!php
+<?php echo dojo_stack( array( 'id' => 'stack1' ) ) ?>
+    <?php echo dojo_content_pane( 'Pane 1', array( 'id' => 'pane1' ) ) ?>
+        This is the first pane!
+    </div>
+    <?php echo dojo_content_pane( 'Pane 2' ) ?>
+        More information to show.
+    </div>
+</div> <!-- div is not closed by helper, so this must be added -->
+<?php echo dojo_button_stack_back('stack1') ?>
+<?php echo dojo_button_stack_select('stack1', 'pane1') ?>
+<?php echo dojo_button_stack_forward('stack1') ?>
+}}}
+
+This will create a stack container housing two content panes and three buttons.  The different dojo_button_stack_* functions create various buttons to control the currently visible content pane.  These functions can also be used in conjunction with accordion and tab containers.  They have a third, or second, parameter of attributes to dojo or for HTML purposes.  The available options for the stack container are:
+ * doLayout - If true, it will change the size of child panes to match the size of the stack container
+
+==== Accordion Container ====
+
+The accordion container is for creating a sliding type arrangement for various pages of information.  To do this, there is a special object called an accordion pane.  This has the same capabilities as a content pane, but also gives some additional information that helps the accordion container.  To create an accordion container, use the dojo_accordion helper.  To create the accordion pane, use the dojo_accordion_pane helper.
+
+{{{
+#!php
+<?php echo dojo_accordion( $attributes ) ?>
+    <?php echo dojo_accordion_pane( 'Pane 1' ) ?>
+        <p>This is the first pane!</p>
+    </div>
+    <?php echo dojo_accordion_pane( 'Pane 2' ) ?>
+        <p>More information to show.</p>
+    </div>
+</div> <!-- div is not closed by helper, so this must be added -->
+}}}
+
+This creates a sliding effect between different panes of information.  Clicking on their title bar cause them to switch between the active pane.  The attributes that can be sent to the accordion container include:
+ * duration - How long, in milliseconds, it takes for panes to slide
+
+==== Border Container ====
+
+The border container is a replacement in Dojo 1.1 for both the layout and split containers.  It uses different options passed to the content panes underneath it that control the resulting behavior.  To create a border container, use the dojo_border helper.  You continue to use the dojo_content_pane helper for the content panes.
+
+{{{
+#!php
+<?php echo dojo_border( array( 'design' => 'headline', 'liveSplitters' => 'true' ) ) ?>
+    <?php echo dojo_content_pane( 'The Title', array( 'region' => 'top', 'minSize' => 50, 'splitter' => 'true', 'style' => 'height: 50px;' ) ) ?>
+        <h1>I'm content!</h1>
+    </div>
+    <?php echo dojo_content_pane( 'Another Pane', array( 'region' => 'center' ) ) ?>
+        <h1>I'm more content!</h1>
+    </div>
+</div> <!-- this div is again left open like the other containers -->
+}}}
+
+This will create a border container that is made up of two sections; one is on top, the other is in the center.  The top pane is capable of being resized using a splitter bar and the center pane will adjust it size to fill the rest of the available space in the div.  One thing to note is that you must make sure that the height of a pane in css is equal to or larger than the minSize for that pane.  Another note is that you must have at least one pane whose region is set to center for the border container to work.  The available options for the border container include:
+ * design - How the container should be designed.  Can be headline, top and bottom span across div, or sidebar, left and right will span from top to bottom of div.  Center will fill in any remaining space
+ * liveSplitters - If true, the user can see the content pane size change as the splitter is moved
