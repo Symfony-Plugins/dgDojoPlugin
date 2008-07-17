@@ -44,7 +44,6 @@ function dojo_link_to_remote($name, $options = array(), $html_options = array())
     return dojo_link_to_function($name, remote_function($options), $html_options);
 }
 
-
 /**
  * Creates a Dojo button to a particular function in javascript.
  *

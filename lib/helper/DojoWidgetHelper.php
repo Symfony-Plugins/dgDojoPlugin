@@ -166,24 +166,6 @@ function dojo_button( $text, $options = array() )
 }
 
 /**
- * Creates a button to a particular function in javascript.
- *
- * @param string $text Text for the button
- * @param string $function Javascript function for the button
- * @param mixed $options Options for the HTML tag or Dojo
- * @return DojoButton The created button for the function
- */
-/*function dojo_button_to_function( $text, $function, $options = array() )
-{
-	if ( $options === null ) $options = array();
-	$options = _parse_attributes( $options );
-	
-	$options['onclick'] = $function.'; return false;';
-	
-	return new DojoButton( $text, array(), $options );
-}*/
-
-/**
  * Create a tooltip for a particular item.
  *
  * @param string $connectId The ID, or list of IDs, for the object to link the
@@ -326,6 +308,14 @@ function dojo_accordion_pane( $title, $options = array() )
 	return tag( 'div', $options, true );
 }
 
+/**
+ * This starts a div for a Dojo border container.  This can do tons of
+ * different things and you should look at the Dojo reference book to get an
+ * idea of what can be done.
+ *
+ * @param mixed $options Set of HTML options for the div tag
+ * @return string The completed HTML div tag for a Dojo border container
+ */
 function dojo_border( $options = array() )
 {
 	if ( $options === null ) $options = array();
@@ -405,6 +395,18 @@ function dojo_content_pane( $title, $options = array() )
 function dojo_includes()
 {
 	echo DojoManager::renderRequires();
+}
+
+/**
+ * Prints the currently set style for Dojo including the class declaration.  
+ * This should be placed in your body tag at the beginning of the layout.  If
+ * you set the style to null or '', it will not add any style to the layout.
+ *
+ */
+function dojo_style()
+{
+    if (DojoManager::getStyle())
+        echo 'class="'.DojoManager::getStyle().'"';
 }
 
 /**

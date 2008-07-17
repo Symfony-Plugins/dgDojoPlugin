@@ -12,8 +12,17 @@ sfLoader::loadHelpers( array( 'Javascript' ) );
 class DojoManager
 {
     protected static
+        /**
+         * This houses the set of requires that have been mentioned to the
+         * manager.
+         */
         $requires     = array(),
-        $dojoIncluded = false;
+        /** Maintains if Dojo JS has been included or not. */
+        $dojoIncluded = false,
+        /** Maintains the current page style for Dijit items. */
+        $style        = 'tundra',
+        /** List of available styles in the default Dojo install. */
+        $dojo_styles  = array('tundra', 'soria', 'nihilo');
     
     /**
      * Adds the dojo javascript to the response.  Uses dojoIncluded variable to
@@ -24,9 +33,9 @@ class DojoManager
     {
         if ( !self::$dojoIncluded )
         {
-            $dojo = sfConfig::get( 'dojo_js', '/js/dojoToolkit/dojo/dojo.js' );
-            $context = sfContext::getInstance();
-            $context->getResponse()->addJavascript( $dojo, '', array( 'djConfig' => 'parseOnLoad: true' ) );
+            $dojo = sfConfig::get( 'dojo_js', '/js/dojoToolkit' );
+            $response = sfContext::getInstance()->getResponse();
+            $response->addJavascript( $dojo.'/dojo/dojo.js', '', array( 'djConfig' => 'parseOnLoad: true' ) );
             self::$dojoIncluded = true;
             self::addRequire( 'dojo.parser' );
         }
@@ -87,13 +96,47 @@ class DojoManager
     }
     
     /**
+     * Sets the style of the body.  If this is one of the base styles in Dojo,
+     * the needed stylesheets will also be included.  If you make your own
+     * style, be sure to include the right stylesheets.
+     *
+     * @param string $style New style for the Dojo widgets
+     */
+    public static function setStyle($style)
+    {
+        self::$style = strtolower($style);
+    }
+    
+    /**
+     * Gets the current style set for Dojo widgets.
+     *
+     * @return string
+     */
+    public static function getStyle()
+    {
+        return self::$style;
+    }
+    
+    /**
      * Generates the list of Dojo require statements that need to be made for
-     * the javascript functions to work.
+     * the javascript functions to work.  It adds the stylesheets to the
+     * response if they are Dojo styles.
      *
      * @return string Dojo require statements put into a javascript tag
      */
     public static function renderRequires()
     {
+        
+        $dojo = sfConfig::get('dojo_js', '/js/dojoToolkit');
+        $response = sfContext::getInstance()->getResponse();
+        $response->addStylesheet("$dojo/dojo/resources/dojo.css");
+        if (in_array(self::$style, self::$dojo_styles))
+        {
+            $style = self::$style;
+            $response->addStylesheet("$dojo/dijit/themes/$style/$style.css");
+        }
+        
+        
     	$rval = '';
     	$requires = self::getRequires();
     	foreach ( $requires as $require => $count )
@@ -104,7 +147,7 @@ class DojoManager
     		}
     	}
     	
-    	return javascript_tag( $rval );
+    	return javascript_tag($rval);
     }
     
     /**
