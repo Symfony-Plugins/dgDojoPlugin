@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This class is used for maintaining Dojo types and function calls so that I
+ * only have one place to go should Dojo ever change their API.  Don't change
+ * these, it may break many things ;).
+ *
+ */
 class DojoTypes
 {
 	const

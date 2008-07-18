@@ -8,9 +8,7 @@
 abstract class DojoWidget extends sfWidget
 {
 	protected
-		/**
-		 * Set of write protected HTML attributes.
-		 */
+		/** Set of write protected HTML attributes. */
 		$protectedAttributes = array();
 	
 	/**

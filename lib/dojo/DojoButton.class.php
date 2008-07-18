@@ -8,6 +8,13 @@
  */
 class DojoButton extends DojoMenuItem
 {	
+    /**
+     * Configures the DojoButton with the correct dojoType and protects this
+     * attribute.
+     *
+     * @param mixed $options Set of options for the object
+     * @param mixed $attributes Set of HTML attributes for the object
+     */
 	protected function configure( $options = array(), $attributes = array() )
 	{
 		$this->setAttribute( 'dojoType', DojoTypes::BUTTON );

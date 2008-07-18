@@ -344,11 +344,6 @@ function dojo_observe_form($form_id, $options = array())
     }
 }
 
-function dojo_visual_effect($name, $element_id = false, $js_options = array())
-{
-    
-}
-
 function dojo_remote_function($options)
 {
     DojoManager::addJavascript();

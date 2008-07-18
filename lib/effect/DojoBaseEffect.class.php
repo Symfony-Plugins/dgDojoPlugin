@@ -1,5 +1,7 @@
 <?php
 
+sfLoader::loadHelpers(array('Dojo'));
+
 /**
  * This is the base class used to specify DojoEffects.
  *
@@ -71,11 +73,16 @@ abstract class DojoBaseEffect
     /**
      * Returns the function call to play a DojoEffect.
      *
+     * @param integer $delay Amount of time in seconds to delay playing
+     * @param boolean $gotoStart Set to true to start the animation at the
+     *                           beginning.  False will make it start from
+     *                           where it currently is.
      * @return string The effect calling the play function.
      */
-    public function play()
+    public function play($delay = 0, $gotoStart = false)
     {
-        return $this->buildEffect().'.play()';
+        $delay *= 1000;
+        return $this->buildEffect().".play($delay, ".(($gotoStart)?'true':'false').")";
     }
     
     /**

@@ -14,13 +14,14 @@ abstract class DojoEffectsContainer extends DojoBaseEffect
     /**
      * Default constructor that sets all of the events for the container.
      *
-     * @param mixed $effects Effects for the container.
+     * @param DojoBaseEffect $effects Variable length number of effects for the
+     *                                container.
      * @throws IllegalArgumentException If any of the effects in the array are
      *                                  not DojoBaseEffects.
      */
-    public function __construct($effects = array())
+    public function __construct()
     {
-        $this->setEffects($effects);        
+        $this->setEffects(func_get_args());
     }
     
     /**

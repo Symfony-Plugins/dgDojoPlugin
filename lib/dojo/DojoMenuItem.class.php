@@ -36,6 +36,13 @@ class DojoMenuItem extends DojoWidget implements ArrayAccess
 		$this->name = $name;
 	}
 	
+	/**
+	 * Configure this widget by setting the dojoType and protecting that
+	 * attribute.
+	 *
+	 * @param mixed $options Set of options for the widget
+	 * @param mixed $attributes Set of HTML options for the created HTML
+	 */
 	protected function configure( $options = array(), $attributes = array() )
 	{
 		$this->setAttribute( 'dojoType', DojoTypes::MENU_ITEM );

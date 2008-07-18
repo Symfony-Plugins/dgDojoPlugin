@@ -15,7 +15,6 @@ class DojoChainEffect extends DojoEffectsContainer
      */
     public function buildEffect()
     {
-        DojoManager::addJavascript();
         DojoManager::addRequire(DojoTypes::DOJO_FX);
         
         return 'dojo.fx.chain(['.implode(',', $this->effects).'])';

@@ -1,12 +1,16 @@
 <?php
 
-sfLoader::loadHelpers(array('Dojo'));
-
+/**
+ * This class houses some of the various parts of a Dojo effect.  It maintains
+ * the node for the effect and handles the default options for base Dojo
+ * effects.
+ *
+ */
 abstract class DojoEffect extends DojoBaseEffect
 {                               
     protected
         /** What node this effect is for. */
-        $node     = null;
+        $node = null;
 
     /**
      * Creates a DojoEffect.
