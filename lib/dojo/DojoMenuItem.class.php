@@ -176,6 +176,27 @@ class DojoMenuItem extends DojoWidget implements ArrayAccess
 	}
 	
 	/**
+	 * Returns the current name for this item.
+	 *
+	 * @return string The name for this item
+	 */
+	public function getName()
+	{
+	    return $this->name;
+	}
+	
+	/**
+	 * Sets the name for this item.  Must be a string or it won't work.
+	 *
+	 * @param string $name Name for the item
+	 */
+	public function setName( $name )
+	{
+	    if (is_string($name))
+	       $this->name = $name;
+	}
+	
+	/**
 	 * Returns the rendered from of the DojoMenuItem including its submenu if
 	 * necessary.  Inheriting classes should override this for printing.
 	 *
@@ -198,7 +219,7 @@ class DojoMenuItem extends DojoWidget implements ArrayAccess
 		}
 		else 
 		{
-			$rval = $this->name;
+			$rval = $name;
 		}
 		
 		return $this->renderContentTag( 'div', $rval, $attributes );
@@ -211,7 +232,7 @@ class DojoMenuItem extends DojoWidget implements ArrayAccess
 	 */
 	public function __toString()
 	{
-		return $this->render( $this->name );
+		return $this->render( $this->name, null, $this->getAttributes() );
 	}
 }
 ?>

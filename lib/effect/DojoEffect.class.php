@@ -57,6 +57,8 @@ abstract class DojoEffect extends DojoBaseEffect
      * duration - How long the effect should play in seconds
      * rate     - The FPS for the effect
      * repeat   - How many times to repeat the effect
+     * easing   - Function taking one decimal argument and returning a decimal
+     *            that allows an effect to 'ease in' and 'ease out'.
      *
      * @return string All of the javascript options that have been set ready
      *                for use by the dojo effect.
@@ -78,6 +80,9 @@ abstract class DojoEffect extends DojoBaseEffect
         
         if (isset($this->options['repeat']) && $this->options['repeat'] > 0)
             $opts['repeat'] = $this->options['repeat'];
+            
+        if (isset($this->options['easing']) && $this->options['easing'])
+            $opts['easing'] = $this->options['easing'];
 
         $this->additionalOptions($opts);
         

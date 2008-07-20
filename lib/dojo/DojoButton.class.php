@@ -37,7 +37,7 @@ class DojoButton extends DojoMenuItem
 		if ( $this->menu !== null )
 		{
 			$attributes['dojoType'] = DojoTypes::DROPDOWN_BUTTON;
-			if ( $this->hasOption( 'onclick' ) )
+			if ( array_key_exists( 'onclick', $attributes ) )
 			{
 				$attributes['dojoType'] = DojoTypes::COMBO_BUTTON;
 			}

@@ -58,13 +58,13 @@ abstract class DojoBaseEffect
         if (isset($this->options['beforeBegin']))
         {
             $code = $this->options['beforeBegin'];
-            $rval['beforeBegin'] = "function() {$code}";
+            $rval['beforeBegin'] = "function() { $code }";
         }
         
         if (isset($this->options['easing']))
         {
             $code = $this->options['easing'];
-            $rval['easing'] = "function(n) {$code}";
+            $rval['easing'] = "function(n) { $code }";
         }
         
         return $rval;

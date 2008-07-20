@@ -31,6 +31,9 @@ class DojoTypes
 		DOJO_FX = 'dojo.fx',
 		DOJOX_FX = 'dojox.fx',
 		CHAIN = 'dojo.fx.chain',
-		COMBINE = 'dojo.fx.combine';
+		COMBINE = 'dojo.fx.combine',
+		SCROLL = 'dojox.fx.scroll',
+		EASING = 'dojox.fx.easing',
+		STYLE = 'dojox.fx.style';
 }
 ?>
